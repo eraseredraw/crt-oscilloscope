@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>CRT OSCILLOSCOPE — virtual room</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="scene"></canvas>
+
+  <!-- Vignette / CRT overlay -->
+  <div id="crt-overlay"></div>
+
+  <!-- Control panel -->
+  <div id="panel">
+    <div class="panel-header">
+      <span class="led" id="power-led"></span>
+      <span id="model-name">CRT-VR-1 · VIRTUAL ROOM</span>
+      <button id="btn-power" class="btn">POWER</button>
+    </div>
+
+    <div class="panel-body">
+      <div class="col">
+        <label>РЕЖИМ</label>
+        <div class="seg" id="seg-mode">
+          <button data-mode="trace" class="active">TRACE</button>
+          <button data-mode="lissajous">LISSAJOUS</button>
+          <button data-mode="perlin">PERLIN</button>
+          <button data-mode="beat">BEAT</button>
+        </div>
+        <label>ЛЮМИНОФОР</label>
+        <div class="seg" id="seg-phosphor">
+          <button data-phosphor="p1" class="active">P1 GREEN</button>
+          <button data-phosphor="p31">P31 AMBER</button>
+          <button data-phosphor="p4">P4 WHITE</button>
+          <button data-phosphor="p11">P11 BLUE</button>
+        </div>
+      </div>
+
+      <div class="col">
+        <label>INTENSITY <span id="val-intensity">70</span></label>
+        <input type="range" id="intensity" min="10" max="100" value="70">
+        <label>PERSISTENCE <span id="val-persistence">60</span></label>
+        <input type="range" id="persistence" min="5" max="100" value="60">
+        <label>FOCUS <span id="val-focus">60</span></label>
+        <input type="range" id="focus" min="10" max="100" value="60">
+      </div>
+
+      <div class="col">
+        <label>TIME/DIV</label>
+        <div class="seg" id="seg-td">
+          <button data-td="0" class="active">1</button>
+          <button data-td="1">.5</button>
+          <button data-td="2">.2</button>
+          <button data-td="3">.1</button>
+          <button data-td="4">50m</button>
+          <button data-td="5">20m</button>
+        </div>
+        <label>VAR TIME <span id="val-var-td">1.00</span></label>
+        <input type="range" id="var-td" min="0" max="100" value="0">
+        <label>POS-H <span id="val-pos-h">50</span></label>
+        <input type="range" id="pos-h" min="0" max="100" value="50">
+        <label>VOLTS/DIV</label>
+        <div class="seg" id="seg-vpd">
+          <button data-vpd="0">50m</button>
+          <button data-vpd="1">.1</button>
+          <button data-vpd="2" class="active">.2</button>
+          <button data-vpd="3">.5</button>
+          <button data-vpd="4">1</button>
+          <button data-vpd="5">2</button>
+          <button data-vpd="6">5</button>
+        </div>
+        <label>VAR VOLTS <span id="val-var-vpd">1.00</span></label>
+        <input type="range" id="var-vpd" min="0" max="100" value="0">
+        <label>POS-V <span id="val-pos-v">50</span></label>
+        <input type="range" id="pos-v" min="0" max="100" value="50">
+      </div>
+
+      <div class="col">
+        <label>TRIGGER</label>
+        <div class="seg" id="seg-sweep">
+          <button data-sweep="auto" class="active">AUTO</button>
+          <button data-sweep="normal">NORM</button>
+          <button data-sweep="single">SINGLE</button>
+        </div>
+        <label>СЛОП</label>
+        <div class="seg" id="seg-slope">
+          <button data-slope="1" class="active">RISE</button>
+          <button data-slope="-1">FALL</button>
+        </div>
+        <label>TRG COUPL</label>
+        <div class="seg" id="seg-trig-coupling">
+          <button data-trig-coupling="dc" class="active">DC</button>
+          <button data-trig-coupling="ac">AC</button>
+        </div>
+        <label>LEVEL <span id="val-level">50</span></label>
+        <input type="range" id="level" min="0" max="100" value="50">
+        <label>JITTER <span id="val-jitter">15</span></label>
+        <input type="range" id="jitter" min="0" max="100" value="15">
+        <label>СВЯЗЬ</label>
+        <div class="seg" id="seg-coupling">
+          <button data-coupling="dc" class="active">DC</button>
+          <button data-coupling="ac">AC</button>
+          <button data-coupling="gnd">GND</button>
+        </div>
+      </div>
+
+      <div class="col">
+        <label>АУДИО</label>
+        <button id="btn-audio" class="btn wide">🎤 ВКЛ МИКРОФОН</button>
+        <div class="seg" id="seg-ch">
+          <button data-ch="1" class="active">CH1 TRG</button>
+          <button data-ch="2">CH2 TRG</button>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle"><input type="checkbox" id="chk-run" checked><span>RUN</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-xy"><span>X-Y</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-grid" checked><span>GRID</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-inv"><span>INV</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="touch-hint">Тап по экрану — волна от точки касания · Свайп = вращение</div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/jsm/"
+} }
+</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

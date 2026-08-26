@@ -1,0 +1,86 @@
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; font-family: "Courier New", monospace; }
+
+#app { position: relative; width: 100%; height: 100%; }
+#scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* CRT overlay: vignette + scanlines + slight flicker */
+#crt-overlay {
+  position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  background:
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.13) 0 1px, rgba(0,0,0,0) 1px 3px);
+  mix-blend-mode: multiply;
+}
+#crt-overlay::after {
+  content: ""; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.012);
+  animation: flicker 3.2s infinite;
+}
+@keyframes flicker {
+  0%, 100% { opacity: 0.6; }
+  45% { opacity: 0.4; }
+  50% { opacity: 0.75; }
+  92% { opacity: 0.5; }
+}
+
+/* Control panel — classic oscilloscope front plate */
+#panel {
+  position: absolute; left: 12px; bottom: 12px; z-index: 10;
+  background: linear-gradient(180deg, #2a2d33, #1c1e22);
+  border: 1px solid #4a4e55; border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08);
+  width: min(680px, calc(100vw - 24px));
+  padding: 12px 14px;
+  color: #9fd48c;
+}
+.panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.panel-header .led {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #3a3a3a; box-shadow: none; transition: all 0.2s;
+}
+.panel-header .led.on { background: #2eff6e; box-shadow: 0 0 8px #2eff6e, 0 0 16px rgba(46,255,110,0.5); }
+.panel-header .led.off { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+#model-name { font-size: 12px; letter-spacing: 2px; color: #b8b8b8; flex: 1; }
+
+.btn {
+  background: #3a3d44; color: #ddd; border: 1px solid #555;
+  border-radius: 5px; padding: 6px 12px; font-family: inherit; font-size: 11px;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.12s;
+}
+.btn:hover { background: #4a4e58; }
+.btn:active { background: #2a2d33; }
+.btn.wide { width: 100%; margin-bottom: 8px; }
+.btn.rec { background: #b33030; border-color: #e44; color: #fff; animation: pulse 1.2s infinite; }
+@keyframes pulse { 50% { opacity: 0.6; } }
+
+.panel-body { display: flex; gap: 18px; flex-wrap: wrap; }
+.col { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 6px; }
+.col label { font-size: 10px; letter-spacing: 1.5px; color: #8a8a8a; margin-top: 4px; }
+
+input[type=range] { width: 100%; accent-color: #2eff6e; height: 4px; background: #333; cursor: pointer; }
+
+.seg { display: flex; gap: 3px; flex-wrap: wrap; }
+.seg button {
+  flex: 1; min-width: 60px; padding: 5px 4px; font-size: 9px; letter-spacing: 0.5px;
+  background: #22252a; color: #8a8a8a; border: 1px solid #3d4148;
+  border-radius: 4px; cursor: pointer; font-family: inherit; transition: all 0.1s;
+}
+.seg button.active { background: #2eff6e; color: #111; border-color: #7dffa0; font-weight: bold; }
+
+.toggle-row { display: flex; gap: 10px; margin-top: 2px; }
+.toggle { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #8a8a8a; cursor: pointer; }
+.toggle input { accent-color: #2eff6e; cursor: pointer; }
+
+#touch-hint {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 6; color: rgba(158,212,140,0.5); font-size: 11px; letter-spacing: 1px;
+  pointer-events: none; text-align: center; padding: 0 10px;
+}
+
+@media (max-width: 640px) {
+  #panel { left: 6px; right: 6px; bottom: 6px; width: auto; }
+  .panel-body { gap: 8px; }
+  .col { min-width: 100px; }
+}
